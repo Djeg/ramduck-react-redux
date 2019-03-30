@@ -1,27 +1,76 @@
-import { addTodo, removeTodo } from './test/State/TodoList'
+import { addTodo, changeNewTodo, removeTodo } from './test/State/TodoList'
 import { boot } from './test'
-import TestRenderer from 'react-test-renderer'
+import { head, keys, map, prop } from 'ramda'
+import { mount } from 'enzyme'
 import TodoList from './test/Component/TodoList'
 
-it('can useData', () => {
-  const { store, element } = boot()
-  const inspector = TestRenderer.create(element)
 
-  store.dispatch(addTodo({ id: 1, text: 'Do you like FRP ?', checked: false }))
+let store, inspector
 
-  const todos = inspector.root.findAllByProps({ className: 'todo' })
+
+beforeEach(() => {
+  const { store: storage, element } = boot()
+  store = storage
+  inspector = mount(element)
+});
+
+
+it('can use data', () => {
+  store.dispatch(addTodo('Do you like FRP ?'))
+
+  inspector.update()
+
+  const todos = inspector.find('.todo')
 
   expect(todos.length).toBe(1)
 
-  const text = inspector.root.findByProps({ className: 'todo' }).findByType('p')
+  const text = inspector.find('.todo p').first()
 
-  expect(text.children).toEqual([ 'Do you like FRP ?' ])
+  expect(text).toHaveText('Do you like FRP ?')
 
-  store.dispatch(removeTodo(1))
+  const id = store.getState().todos.list
+    |> keys
+    |> head
 
-  inspector.update(element)
+  store.dispatch(removeTodo(id))
 
-  const todos2 = inspector.root.findAllByProps({ className: 'todo' })
+  inspector.update()
+
+  const todos2 = inspector.find('.todo')
 
   expect(todos2.length).toBe(0)
+});
+
+
+it('can use action effect', () => {
+  const input = inspector.find('input[type="text"]').first()
+  input.simulate('change', { target: { value: 'Do you like chocolate ?' } })
+
+  inspector.update()
+
+  inspector.find('button').first().simulate('click')
+
+  inspector.update()
+
+  expect(store.getActions().length).toBe(2)
+  expect(map(prop('type'), store.getActions())).toEqual([
+    String(changeNewTodo),
+    String(addTodo),
+  ])
+
+  const todo = inspector.find('.todo p').first()
+
+  expect(todo).toHaveText('Do you like chocolate ?')
+});
+
+
+it('can use state', () => {
+  const input = inspector.find('input[type="text"]').first()
+  input.simulate('change', { target: { value: 'Do you like chocolate ?' } })
+
+  inspector.update()
+
+  const p = inspector.find('.new-todo p').first()
+
+  expect(p).toHaveText('Do you like chocolate ?')
 });

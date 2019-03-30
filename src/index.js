@@ -1,5 +1,5 @@
 import { ReactReduxContext } from 'react-redux'
-import { T, bind, cond, path, pathOr, split, uncurryN } from 'ramda'
+import { T, bind, cond, map, path, pathOr, split, uncurryN } from 'ramda'
 import { useContext } from 'react'
 
 
@@ -16,7 +16,7 @@ export const useData = (name, dotPath) => {
 
 
 // useDataOr :: a -> String -> String -> a
-export const useDataOr = uncurryN(3, defaultValue => name => dotPath => {
+export const useDataOr = (defaultValue, name, dotPath) => {
   const { store } = useContext(ReactReduxContext)
   const state = store.getState()
   const paths = dotPath
@@ -24,15 +24,15 @@ export const useDataOr = uncurryN(3, defaultValue => name => dotPath => {
     : [ `${name}` ]
 
   return pathOr(defaultValue, paths, state)
-})
+}
 
 
-// useState :: (a -> b) -> b
-export const useState = extractor => {
+// useState :: String -> (a -> b) -> b
+export const useState = (name, extractor) => {
   const { store } = useContext(ReactReduxContext)
   const state = store.getState()
 
-  return extractor(state)
+  return extractor(state[name])
 }
 
 
@@ -41,17 +41,17 @@ export const useAction = functor => {
   const { store } = useContext(ReactReduxContext)
   const dispatch = bind(store.dispatch, store)
 
-  return dispatchAction(dispatch, functor)
+  return () => dispatchAction(dispatch, functor)
 }
 
 
 // useActionEff :: Functor a => (React.SyntheticEvent -> a) -> React.SyntheticEvent -> *
-export const useActionEff = uncurryN(2, eff => {
+export const useActionEff = eff => {
   const { store } = useContext(ReactReduxContext)
   const dispatch = bind(store.dispatch, store)
 
   return event => dispatchAction(dispatch, eff(event))
-})
+}
 
 
 // dispatchAction :: (Action a -> *) -> b -> *

@@ -40,10 +40,15 @@
     "@babel/plugin-proposal-pipeline-operator": "^7.3.2",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
+    "@lato/babel-plugin-function-composition": "^0.4.3",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "cross-env": "^5.2.0",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.11.2",
     "jest": "^23.6.0",
+    "jest-environment-enzyme": "^7.0.2",
+    "jest-enzyme": "^7.0.2",
     "ramduck-redux": "^2.0.0",
     "react-dom": "^16.8.6",
     "react-test-renderer": "^16.8.6",
@@ -57,6 +62,13 @@
     "react": "^16.8.6",
     "react-redux": "^6.0.1"
   },
+  "jest": {
+    "setupTestFrameworkScriptFile": "jest-enzyme",
+    "testEnvironment": "enzyme",
+    "testEnvironmentOptions": {
+      "enzymeAdapter": "react16"
+    }
+  },
   "babel": {
     "presets": [
       "@babel/preset-env",
@@ -68,7 +80,8 @@
         {
           "proposal": "minimal"
         }
-      ]
+      ],
+      "@lato/babel-plugin-function-composition"
     ],
     "env": {
       "esm": {
