@@ -1,5 +1,5 @@
 import { map, path, prop, values } from 'ramda'
-import { useAction, useActionEff, useData, useState } from '../..'
+import { useAction, useActionEff, useData, useDataOr, useState } from '../..'
 import React from 'react'
 import TodoList, {
   addTodo,
@@ -31,6 +31,9 @@ export default () =>
     }>Add todo</button>
     <div className="new-todo">
       <p>{useState(TodoList, prop('newTodo'))}</p>
+    </div>
+    <div className="data-or">
+      <p>{useDataOr('default', TodoList, 'undefined')}</p>
     </div>
   </div>
 

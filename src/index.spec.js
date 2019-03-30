@@ -74,3 +74,10 @@ it('can use state', () => {
 
   expect(p).toHaveText('Do you like chocolate ?')
 });
+
+
+it('can use data or a default value', () => {
+  const p = inspector.find('.data-or p').first()
+
+  expect(p).toHaveText('default')
+});
